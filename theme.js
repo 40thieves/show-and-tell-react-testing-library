@@ -1,9 +1,9 @@
 import { default as theme, syntaxHighlighterPrism } from '@mdx-deck/themes'
-import { okaidia as syntaxTheme } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export default {
   ...theme,
-  ...syntaxHighlighterPrism({ prism: { style: syntaxTheme } }),
+  ...syntaxHighlighterPrism({ prism: { style: okaidia } }),
   colors: {
     code: '#000'
   },
