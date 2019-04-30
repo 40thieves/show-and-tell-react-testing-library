@@ -1,0 +1,187 @@
+export { default as theme } from './theme'
+
+import { Head } from 'mdx-deck'
+import { Split } from 'mdx-deck/layouts'
+
+<Head>
+  <title>react-testing-library</title>
+</Head>
+
+# `react-testing-library`
+## or: How I Stopped Worrying and Learned To Love Integration Tests
+### Show & Tell - May 2019
+
+---
+
+## Recap
+
+React works by giving it a "description of the DOM" that we want to see in the 
+"real DOM". We never* directly manipulate the DOM ourselves.
+
+React then figures out the most efficient way to transform the real DOM into our
+description
+
+<small>(* this isn't quite true, but for our purposes let's imagine that it is)</small>
+
+---
+
+## React Testing Strategies
+
+Because of this we could write tests that check this "description" (which is
+just a JS object) to see if contains what we expect. We don't necessarily need
+to apply the transformation to the DOM.
+
+This is potentially useful, because now we can run frontend tests in Node,
+without having to use a real browser
+
+There's very popular library to do this: [Enyzme](https://airbnb.io/enzyme/)
+
+---
+
+## What's the problem?
+
+<div style={{ fontSize: '2.2rem' }}>
+The "description", isn't the real DOM, it's actually a double (aka
+mock/fake/stub).
+
+Enzyme's API allows you to check the internal state/props of a component.
+
+It allows you to "reach in" to find other child components.
+
+These are implementation details that the user doesn't care about. They don't
+care that a component named `PublishModal` is rendered. They care that they can
+see journals and can click on publish buttons.
+
+These points are made in [this blog post](https://kentcdodds.com/blog/why-i-never-use-shallow-rendering).
+</div>
+
+---
+
+## `react-testing-library`
+
+RTL is a utility library that encourages good testing practices.
+
+The [guiding principles](https://testing-library.com/docs/guiding-principles)
+state that using DOM node is better than component instances. So it doesn't use
+shallow rendering.
+
+<div style={{ fontSize: '1.4rem' }}>
+Note: the recommended way in the docs is to use JSDOM (an "fake" implementation
+of the DOM in Node). But we have a real browser available to us because we use,
+which runs the tests in headless Chrome.
+</div>
+
+---
+
+```jsx
+import { render, fireEvent, waitForElement } from 'react-testing-library'
+import EmisExport from 'Modules/publish-modal/public/es/src/components/emis_export'
+
+it('sends data when starting export', async () => {
+  const { getByText } = render(<EmisExport />)
+
+  const submitButton = getByText(/submit to myjournal/i)
+  fireEvent.click(submitButton)
+
+  await waitForElement(() => getByText(/export successful/i))
+
+  expect(getByText(/export failed/i)).to.not.exist
+})
+```
+
+---
+
+## Write tests "the way the user would use it"
+
+The user does not care how the code is implemented. They only care that they can
+click a button and then they see a message.
+
+[The more your tests resemble the way your software is used, the more confidence they can give you.](https://twitter.com/kentcdodds/status/977018512689455106)
+
+This was the biggest hurdle to me: I'm not used to thinking from the users
+perspective when writing tests.
+
+---
+
+Because of this principle, the API forces you to operate the application via
+relatively limited "queries". These queries (e.g. `getByText()`) can only be
+used like a user would think about using the application.
+
+So you can't get an element by it's CSS selector. Users don't think about
+getting elements by CSS selectors. That is an implementation detail.
+
+---
+
+This also forces us to think about accessibility
+
+```jsx
+const Textbox = () => {
+  return <input type="text" />
+}
+
+it('renders', () => {
+  const { getByLabelText } = render(<Textbox />)
+
+  // This fails: because we don't have a label for our textbox
+  // We can fix by adding <label>Some label text</label> to our component
+  expect(getByLabelText(/some label text/i)).to.exist
+})
+```
+
+All tests must be driven through user-perceivable elements.
+
+---
+
+Our tests are really integration tests: they test more than a single unit.
+
+Instead they test how a unit works in context.
+
+Previously I would have said this was generally bad - the majority of
+our tests should be unit tests not integration tests.
+
+---
+
+Kent C. Dodds argues that the "test pyramid" should instead be a
+["test trophy"](https://kentcdodds.com/blog/write-tests):
+
+<Split>
+
+![Test pyramid](https://kentcdodds.com/static/20c422f5dad15169acfae9613c561dad/8ff1e/2.png)
+
+![Test trophy](https://pbs.twimg.com/media/DVUoM94VQAAzuws.jpg)
+
+</Split>
+
+---
+
+Unit tests are cheap to create, but you need a lot of them to be confident in
+your code.
+
+End-to-end tests give you the greatest confidence that your implementation is
+correct. But they are costly to create and prone to flakiness.
+
+---
+
+Integration tests hit the sweet spot of not being too costly to create without
+but give reasonable confidence that your application will work well for users.
+
+All three types are still required, but focusing on having the most integration
+tests is the most "efficient".
+
+---
+
+## Things to keep an eye on
+
+RTL is still very new, I'm still not 100% convinced.
+
+- Is `waitForElement()` flaky?
+- Can the query API sometimes give you false positives - getting elements
+elsewhere in the DOM that you didn't intend?
+
+---
+
+## Thanks!
+
+What questions do you have?
+
+<small>You can see the source for this presentation [here]()</small>
