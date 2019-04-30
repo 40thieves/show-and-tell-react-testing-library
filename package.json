@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "mdx-deck slides.mdx"
+    "start": "mdx-deck slides.mdx",
+    "build": "mdx-deck build slides.mdx"
   },
   "keywords": [],
   "author": "Alasdair Smith <ali@alasdairsmith.co.uk>",
