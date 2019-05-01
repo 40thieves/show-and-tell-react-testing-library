@@ -15,8 +15,9 @@ import { Split } from 'mdx-deck/layouts'
 
 ## Recap
 
-React works by giving it a "description of the DOM" that we want to see in the 
-"real DOM". We never* directly manipulate the DOM ourselves.
+React works by giving it a ["description of the DOM"](https://amazing-golick-cd8b08.netlify.com/#7)
+that we want to see in the  "real DOM". We never* directly manipulate the DOM
+ourselves.
 
 React then figures out the most efficient way to transform the real DOM into our
 description
@@ -27,9 +28,9 @@ description
 
 ## React Testing Strategies
 
-Because of this we could write tests that check this "description" (which is
-just a JS object) to see if contains what we expect. We don't necessarily need
-to apply the transformation to the DOM.
+Because of this we could write tests that check this "description" to see if
+contains what we expect. We don't necessarily needto apply the transformation to
+the DOM.
 
 This is potentially useful, because now we can run frontend tests in Node,
 without having to use a real browser
