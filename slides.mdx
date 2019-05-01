@@ -41,29 +41,36 @@ There's very popular library to do this: [Enyzme](https://airbnb.io/enzyme/)
 ## What's the problem?
 
 <div style={{ fontSize: '2.2rem' }}>
-The "description", isn't the real DOM, it's actually a double (aka
+This "description", isn't the real DOM, it's actually a double (aka
 mock/fake/stub).
 
 Enzyme's API allows you to check the internal state/props of a component.
 
 It allows you to "reach in" to find other child components.
 
-These are implementation details that the user doesn't care about. They don't
-care that a component named `PublishModal` is rendered. They care that they can
-see journals and can click on publish buttons.
+These are all implementation details that the user doesn't care about. They
+don't care that a component named `PublishModal` is rendered. They don't care
+about the internal state.
 
-These points are made in [this blog post](https://kentcdodds.com/blog/why-i-never-use-shallow-rendering).
+They care that they can see journals and can click on publish buttons.
+
+<div style={{ fontSize: '1.4rem' }}>
+
+The author of `react-testing-library` (Kent C. Dodds) makes these points in [this blog post](https://kentcdodds.com/blog/why-i-never-use-shallow-rendering)
+about why it doesn't use shallow rendering.
+
+</div>
 </div>
 
 ---
 
 ## `react-testing-library`
 
-RTL is a utility library that encourages good testing practices.
+RTL is a utility library that encourages good testing practices. It doesn't use
+shallow rendering but instead makes rendering real DOM nodes easier.
 
 The [guiding principles](https://testing-library.com/docs/guiding-principles)
-state that using DOM node is better than component instances. So it doesn't use
-shallow rendering.
+state that using a DOM node is better than component instances.
 
 <div style={{ fontSize: '1.4rem' }}>
 Note: the recommended way in the docs is to use JSDOM (an "fake" implementation
@@ -103,9 +110,10 @@ perspective when writing tests.
 
 ---
 
-Because of this principle, the API forces you to operate the application via
-relatively limited "queries". These queries (e.g. `getByText()`) can only be
-used like a user would think about using the application.
+Because of this principle, the react-testing-library API forces you to operate
+the application via relatively limited "queries". These queries (e.g.
+`getByText()`) can only be used like a user would think about using the
+application.
 
 So you can't get an element by it's CSS selector. Users don't think about
 getting elements by CSS selectors. That is an implementation detail.
@@ -116,14 +124,14 @@ This also forces us to think about accessibility
 
 ```jsx
 const Textbox = () => {
-  return <input type="text" />
+  return <input type="text" id="textbox" />
 }
 
 it('renders', () => {
   const { getByLabelText } = render(<Textbox />)
 
   // This fails: because we don't have a label for our textbox
-  // We can fix by adding <label>Some label text</label> to our component
+  // We can fix by adding <label for="textbox">Some label text</label> to our component
   expect(getByLabelText(/some label text/i)).to.exist
 })
 ```
